@@ -15,7 +15,7 @@ I have a job board which people can use to search for jobs as well as an admin s
 2. `bundle exec rake db:migrate:reset db:seed`
 
 ### Requirements
-Fork this repo and make whatever updates necessary to achieve the following tasks:
+Clone this repo and make whatever updates necessary to achieve the following tasks:
 
 - Shucks, my seed task doesn't work all the way. Check out the seeds file to find out what it needs.
 - Add pagination to jobs#idx, admin/jobs#idx, and users#idx
@@ -25,3 +25,7 @@ Fork this repo and make whatever updates necessary to achieve the following task
 - In order to match Users to Jobs I'll need Users to be able to set their job skills too.
 - admin/matched_jobs#idx isn't the most efficient method nor is UserJobMatch the most well thought out (or actually functioning) match score. What changes would you make given the information we have?
 - Our admins would love to get a list of which users match a specific job. That way we can do something with recruiters cause they like that sorta thing.
+
+### Submission
+
+Zip up your job_board directory and email it to  [avazquez@pairin.com](mailto:avazquez@pairin.com?Subject=Job%20Board)
