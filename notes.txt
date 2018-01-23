@@ -1,0 +1,8 @@
+Greetings Alejandro!
+
+As I'm not sure if you'll end up re-using this exercise ever, I've decided to create a "notes.txt" file for you, instead of showing what I've done / progress in the README.md file.  This file will help to inform you to what things I've done and why I've done them, as well as allowing me to keep track of my thoughts and progress.
+
+I normally operate in a time to completion order, doing the easiest tasks first (getting 20 easy things done looks/feels way more productive than getting 1 big thing done).  I will attempt to tackle things in this order regarding the job_board tasks at hand.
+
+bundle exec rake db:migrate:reset works, bundle exec rake db:seed fails.
+Seeds:
