@@ -9,13 +9,16 @@ class Seeder
 
   def import_csvs
     SEED_MODELS.each do |klass|
-
+      tn = Time.now
       klass.bulk_insert do |worker|
         csv_data(klass).each do |row|
           worker.add(row)
         end
 
         worker.save!
+      end
+      if klass == User
+        puts "Their bulk input: #{Time.now - tn}"
       end
     end
   end
@@ -47,7 +50,6 @@ class Seeder
         skill_ids << random_skill unless skill_ids.include?(random_skill) || random_skill == 0 # Duplication and 0 check.
       end # i in 0...
       skill_ids.each do |s|
-
         stmnt = "insert into job_skill_connections(job_id, job_skill_id, importance, created_at, updated_at) values (#{job.id}, #{s}, #{ Random.rand(10) +1 }, '#{Time.now}', '#{Time.now}')"
         cmds << stmnt
       end
@@ -57,13 +59,14 @@ class Seeder
     db.results_as_hash = true
 
     # This is the bulk execution.
+    tn = Time.now
     db.execute("begin")
     cmds.each do |stmnt|
       db.execute(stmnt)
     end # cmds.each...
     db.execute("commit")
+    puts "Whil's bulk entry: #{Time.now - tn}"
     db.close
-
   end
 
   private

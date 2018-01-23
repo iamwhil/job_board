@@ -5,4 +5,16 @@ As I'm not sure if you'll end up re-using this exercise ever, I've decided to cr
 I normally operate in a time to completion order, doing the easiest tasks first (getting 20 easy things done looks/feels way more productive than getting 1 big thing done).  I will attempt to tackle things in this order regarding the job_board tasks at hand.
 
 bundle exec rake db:migrate:reset works, bundle exec rake db:seed fails.
+
 Seeds:
+It looks like you've used a bulk_insert gem, but in lieu of using gems (as we discussed), I'll do this by hand to show you how and why we sould do this. The idea is that inserting into a database in bulk is MUCH faster than doing the operations 1 at a time.
+
+Also there is a check against the `random_skill = Random.rand(all_skills.length + 1)` generating 0.  The +1 should ensure this, as Random.rand(max_val) generates a random number between 0 and max_val.  However, I saw in the skill_ids (made from random_skill numbers), '0's popping up.
+
+Fun fact - I put some tn-Time.now() in the seeds to see what the time difference between directly inserting into the database (my way) and using the gem.  You'll see a "their bulk input" and "Whil's bulk input" statements that I left in for fun.  Mine looks to be 36% faster on average. Woo! I'm saving you that time you busy man you!
+
+Pagination:
+
+I felt that the best way to go about the pagination was also to combine it with point #3 which reqeusts caching.  I've used memcached (Which you should have on Mac and Linux systems) and the accompanying Dalli Gem (bundle install).  I have enabled it in the config/environments/development.rb, I did not enable it for production, as I doubt this is being deployed anywhere. I've also assumed that the caches will remain static (no new jobs), for simplicity.  But in a real environment, I would rebuild the cache after Jobs or Users were created, updated, or destroyed.
+
+The memcached.rb intializer builds the inital cache when the server is started up.  Thee keys are based on the class and then pagination, eg: :jobs_page1.  Arbitrarily I chose 10 items per page.  Because memcached is not persistent, I've used .fetch() to retrieve the data.  If the data is not found in the cache it is rebuilt.  If the page is requested out of range, eg. jobs_page70 (Jobs 700 to 709) an empty array is returned.
