@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   end
 
   resources :jobs, only: [:index, :show]
-  
-  resources :users, only: [] do
+
+  resources :users, only: [:index] do
     resources :matched_jobs, only: :index
   end
 

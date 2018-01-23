@@ -13,7 +13,7 @@ models.each do |klass|
 	klass.all.order(:id).each do |item|
 		set << item
 		if i % items_per_page == 0 
-			cache_key = "#{klass.to_s.pluralize.downcase}_page#{(i / items_per_page).to_i}".to_sym
+			cache_key = "#{klass.to_s.pluralize.downcase}_page#{((i / items_per_page)).to_i}".to_sym
 			Rails.cache.write(cache_key, set)
 			set = []
 		end
