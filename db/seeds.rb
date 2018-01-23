@@ -21,10 +21,11 @@ class Seeder
   end
 
   def connect_job_skills
-    # It looks like you've used a bulk_insert gem, but in lieu of using gem's 
+    # It looks like you've used a bulk_insert gem, but in lieu of using gems (as we discussed)
     # I'll just do this by hand to show you how and why we sould do this. 
     # The idea is that inserting into a database in 
-    # bulk is MUCH faster than doing the operations 1 at a time!
+    # bulk is MUCH faster than doing the operations 1 at a time
+
     #   Instructions:
     #   connect between 1 & 10 skills to each job please.
     #   i would also like a random importance number to be set on the connection.
@@ -33,17 +34,20 @@ class Seeder
     all_jobs = Job.all # Load all of the jobs
     all_skills = JobSkill.all 
     cmds = [] # Array of sql commands we will execute to populate our database with job/skill relations.
-    config = Rails.configuration.database_configuration
+    # Find the current database. Hard coding this to development would not let you see production.
+    config = Rails.configuration.database_configuration 
     database = config[Rails.env]["database"]
 
+    # For each job, add a random number of skills with a random importance.
     all_jobs.each do |job|
       skill_qty = Random.rand(10) + 1 # Random number of skills to attach to the job
       skill_ids = [] # Collection of skill id's - used so we don't duplicate skills.
       for i in 0..skill_qty
         random_skill = Random.rand(all_skills.length + 1)
-        skill_ids << random_skill unless skill_ids.include?(random_skill) # Duplication check
+        skill_ids << random_skill unless skill_ids.include?(random_skill) || random_skill == 0 # Duplication and 0 check.
       end # i in 0...
       skill_ids.each do |s|
+
         stmnt = "insert into job_skill_connections(job_id, job_skill_id, importance, created_at, updated_at) values (#{job.id}, #{s}, #{ Random.rand(10) +1 }, '#{Time.now}', '#{Time.now}')"
         cmds << stmnt
       end
@@ -52,12 +56,13 @@ class Seeder
     db = SQLite3::Database.open(database)
     db.results_as_hash = true
 
-    # This is the bulk execution
+    # This is the bulk execution.
     db.execute("begin")
     cmds.each do |stmnt|
       db.execute(stmnt)
     end # cmds.each...
     db.execute("commit")
+    db.close
 
   end
 
