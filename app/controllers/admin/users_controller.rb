@@ -1,8 +1,14 @@
 module Admin
   class UsersController < ApplicationController
 
+    before_action only: [:index] do 
+      set_cache_key(User)
+    end
+
     def index
-      @users = User.all
+      @users = Rails.cache.fetch(@cache_key) do 
+        rebuild_cache(@cache_key, User)
+      end
     end
 
     def create

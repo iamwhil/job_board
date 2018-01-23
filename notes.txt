@@ -1,6 +1,6 @@
 Greetings Alejandro!
 
-As I'm not sure if you'll end up re-using this exercise ever, I've decided to create a "notes.txt" file for you, instead of showing what I've done / progress in the README.md file.  This file will help to inform you to what things I've done and why I've done them, as well as allowing me to keep track of my thoughts and progress.
+As I'm not sure if you'll end up re-using this exercise ever, I've decided to create a "notes.txt" file for you, instead of documenting what I've done / progress in the README.md file.  This file will help to inform you to what things I've done and why I've done them, as well as allowing me to keep track of my thoughts and progress.
 
 I normally operate in a time to completion order, doing the easiest tasks first (getting 20 easy things done looks/feels way more productive than getting 1 big thing done).  I will attempt to tackle things in this order regarding the job_board tasks at hand.
 
@@ -18,3 +18,6 @@ Pagination:
 I felt that the best way to go about the pagination was also to combine it with point #3 which reqeusts caching.  I've used memcached (Which you should have on Mac and Linux systems) and the accompanying Dalli Gem (bundle install).  I have enabled it in the config/environments/development.rb, I did not enable it for production, as I doubt this is being deployed anywhere. I've also assumed that the caches will remain static (no new jobs), for simplicity.  But in a real environment, I would rebuild the cache after Jobs or Users were created, updated, or destroyed.
 
 The memcached.rb intializer builds the inital cache when the server is started up.  Thee keys are based on the class and then pagination, eg: :jobs_page1.  Arbitrarily I chose 10 items per page.  Because memcached is not persistent, I've used .fetch() to retrieve the data.  If the data is not found in the cache it is rebuilt.  If the page is requested out of range, eg. jobs_page70 (Jobs 700 to 709) an empty array is returned.
+
+Admin: 
+I just took a look at the admin side.  And realized this is where things are updated / destroyed.

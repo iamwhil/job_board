@@ -1,8 +1,14 @@
 module Admin
   class JobsController < ApplicationController
 
+    before_action only: [:index] do 
+      set_cache_key(Job)
+    end
+
     def index
-      @jobs = Job.all
+      @jobs = Rails.cache.fetch(@cache_key) do 
+        rebuild_cache(@cache_key, Job)
+      end
     end
 
     def show
