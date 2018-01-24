@@ -6,12 +6,13 @@ class JobsController < ApplicationController
 
   def index
     @jobs = []
-    # handle a search.
+    # Handle a search.
     search_p = search_params # Initialize search_p so we don't have to keep calling search_params.
     if search_p['title'] || search_p['description']
       @jobs = []
       @jobs += search_job(search_params['title'], 'title') if search_p['title']
       @jobs += search_job(search_params['description'], 'description') if search_p['description']
+      @jobs.uniq! # Don't return duplicate jobs.
     else
       @jobs = Rails.cache.fetch(@cache_key) do 
         rebuild_cache(@cache_key, Job)

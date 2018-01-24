@@ -19,7 +19,24 @@ I felt that the best way to go about the pagination was also to combine it with 
 
 The memcached.rb intializer builds the inital cache when the server is started up.  Thee keys are based on the class and then pagination, eg: :jobs_page1.  Arbitrarily I chose 10 items per page.  Because memcached is not persistent, I've used .fetch() to retrieve the data.  If the data is not found in the cache it is rebuilt.  If the page is requested out of range, eg. jobs_page70 (Jobs 700 to 709) an empty array is returned.
 
-Point 2 requests for the users#index to be paginated.  However, there was no controller for users or the accompanying views.  How do you make these?! Just kidding, controller generated and views created.  Additionally the index route was created for the users resources.  
+Point 2 requests for the users#index to be paginated.  However, there was no controller for users or the accompanying views.  How do you make these?! Just kidding, controller generated and views created.  Additionally the index route was created for the users resources.
+
+To use the pagination, send the "page" as a parameter to the index.  
+Eg. `/jobs/?page=2`
+
+Point 3 - A fuzzier search.
+
+Caching has been implimented mostly in point 2, and the memcached / Dalli implementation continues to be used here.
+
+The search has been made less strict by searching the jobs based on the terms in the title or the description.  This has been implimented by creating and then caching a hash where the keys are the terms, and the values are the job ids.  When a search is performed, the search terms are separated by white space, and then the hash's keys are searched for the individual terms.  If the term is found in the hash, the Jobs are returned where the ids match the values in the hash.
+
+The Jobs returned from a search are not paginated as they do not fit the cache / pagination workflow I have implemented.
+
+The search functionality follows the previously built functionality (and white space formatting).  To use the search send either or both the 'title' or 'descrpition' parameters.  Jobs with the matching title terms will be returned first.
+Examples:
+title only search: `/jobs/?title=programmer` or `/jobs/?title=programmer accountant`
+description only search: `/jobs/?description=ipsum`
+title & description search:  `/jobs/?title=Programmer Accountant&description=ipsum`
 
 Admin: 
 I just took a look at the admin side.  And realized this is where Jobs and Users are updated / destroyed.  When the CrUD actions are taken, I will rebuild the cache!
