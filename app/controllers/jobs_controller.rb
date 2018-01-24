@@ -22,7 +22,6 @@ class JobsController < ApplicationController
           Job.all
         end
         @jobs = filter_jobs(search_p['filter'].split(','))
-        puts @jobs.length
       else
         @jobs = Rails.cache.fetch(@cache_key) do 
           rebuild_cache(@cache_key, Job)
@@ -83,9 +82,6 @@ class JobsController < ApplicationController
       possible_jobs = []
       terms.each do |term|
         possible_jobs += JobSkill.find_by(title: term).jobs if JobSkill.find_by(title: term)
-      end
-      @jobs.each do |job|
-        puts job.job_skills.inspect
       end
       @jobs.map {|job| job if possible_jobs.include?(job)}.delete_if { |job| job.nil? }.uniq
     end
