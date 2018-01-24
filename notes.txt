@@ -15,7 +15,7 @@ Fun fact - I put some tn-Time.now() in the seeds to see what the time difference
 
 Point 2 - Pagination:
 
-I felt that the best way to go about the pagination was also to combine it with point #3 which reqeusts caching.  I've used Memcached (Which you should have on Mac and Linux systems) and the accompanying Dalli Gem (bundle install).  I have enabled it in the config/environments/development.rb, I did not enable it for production, as I doubt this is being deployed anywhere.  Enabling it in production, however, is much the same.  I've also assumed that the caches will remain static (no new jobs), for simplicity.  In a real environment, I would rebuild the cache after Jobs or Users were created, updated, or destroyed (I've since realized that this is going to be done on the admin side - however I'm sadly out of time).
+I felt that the best way to go about the pagination was also to combine it with point #3 which requests caching.  I've used Memcached (Which you should have on Mac and Linux systems) and the accompanying Dalli Gem (bundle install).  I have enabled it in the config/environments/development.rb, I did not enable it for production, as I doubt this is being deployed anywhere.  Enabling it in production, however, is much the same.  I've also assumed that the caches will remain static (no new jobs), for simplicity.  In a real environment, I would rebuild the cache after Jobs or Users were created, updated, or destroyed (I've since realized that this is going to be done on the admin side - however I'm sadly out of time).
 
 The memcached.rb intializer builds the inital cache when the server is started up.  The keys are based on the class and then pagination, eg: :jobs_page1 or :users_page7, etc.  Arbitrarily I chose 10 items per page.  Because Memcached is not persistent, I've used .fetch() to retrieve the data.  If the data is not found in the cache it is rebuilt.  If the page is requested out of range, eg. jobs_page70 (Jobs 700 to 709) an empty array is returned.
 
@@ -57,20 +57,20 @@ Hour 6 discussion:
 
     Unfortunately I'm at the 6 hour mark (a little bit over), and have pile of work I currently need to do for SafetySpot, which amassed up while we were furloughed last week!  I've tried to briefly address the points I was unable to get to below.
 
-	Ideally I would make the filtering more user friendly by making the filter terms less strict.  This could also be sped up by caching a hash with title terms as keys and an array of JobSkill id's as the values. Finding the JobSkills would function roughly the same as the title and description search.
+Ideally I would make the filtering more user friendly by making the filter terms less strict.  This could also be sped up by caching a hash with title terms as keys and an array of JobSkill id's as the values. Finding the JobSkills would function roughly the same as the title and description search.
 
-	Point 5 - Incomplete - Only allow 'admins' to access my admin namespace.
+Point 5 - Incomplete - Only allow 'admins' to access my admin namespace.
 
-	To complete this I would utilize sessions and force the user to login before accessing the admin side.  This would be done with a before_action filter on the admin controller.  If the authentication failed I would return an error and let the client's browser / API interface notify the user.
+To complete this I would utilize sessions and force the user to login before accessing the admin side.  This would be done with a before_action filter on the admin controller.  If the authentication failed I would return an error and let the client's browser / API interface notify the user.
 
-	Point 6 - Incomplete - In order to match Users to Jobs I'll need Users to be able to set their job skills too.
+Point 6 - Incomplete - In order to match Users to Jobs I'll need Users to be able to set their job skills too.
 
-	Again here I would like to add a password field to the user and create a session for the user if they log in.  I would then have a JobSkill controller with before_action filters to check the session, which would allow authenticated users to set their job skills.  Non-authenticated users would again receive error messages.
+Again here I would like to add a password field to the user and create a session for the user if they log in.  I would then have a JobSkill controller with before_action filters to check the session, which would allow authenticated users to set their job skills.  Non-authenticated users would again receive error messages.
 
-	Point 7 - Incomplete - admin/matched_jobs#idx isn't the most efficient method nor is UserJobMatch the most well thought out (or actually functioning) match score. What changes would you make given the information we have?
+Point 7 - Incomplete - admin/matched_jobs#idx isn't the most efficient method nor is UserJobMatch the most well thought out (or actually functioning) match score. What changes would you make given the information we have?
 
-	Given the information at hand, admin/matched_jobs is not a controller!  However the matched_jobs is a controller, and digging through the UserJobMatch, the quickest way I see to vastly improve the match score is to have the running summ be a total of the JobSkillConnection's importance instead of just a +1 if the skill is present.
+Given the information at hand, admin/matched_jobs is not a controller!  However the matched_jobs is a controller, and digging through the UserJobMatch, the quickest way I see to vastly improve the match score is to have the running 'summ' be a total of the JobSkillConnection's importance instead of just a +1 if the skill is present.
 
-	Point 8 - Incomplete - Our admins would love to get a list of which users match a specific job. That way we can do something with recruiters cause they like that sorta thing.
+Point 8 - Incomplete - Our admins would love to get a list of which users match a specific job. That way we can do something with recruiters cause they like that sorta thing.
 
-	On the admin/matched_jobs I would create a "report" method, and a cooresponding route in the routes.  When requested it would send back a list of users which match a specific job and their match score, ordered by the match score.
+On the admin/matched_jobs I would create a "report" method, and a corresponding route in the routes.  When requested it would send back a list of users which match a specific job and their match score, ordered by the match score.
